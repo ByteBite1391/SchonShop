@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}پروفایل من | شون{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="heading" style="margin-bottom:30px;">پروفایل من</h2>
+            
+            <div class="row">
+                <div class="col-md-6 col-xs-12">
+                    <div style="background:#fff;padding:30px;border-radius:10px;margin-bottom:30px;">
+                        <h3 style="font-size:18px;color:#494949;margin-bottom:20px;">اطلاعات کاربری</h3>
+                        <div style="margin-bottom:15px;">
+                            <strong style="color:#757575;">ایمیل:</strong>
+                            <span style="color:#494949;">{{ user.email }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-xs-12">
+                    <div style="background:#fff;padding:30px;border-radius:10px;">
+                        <h3 style="font-size:18px;color:#494949;margin-bottom:20px;">اطلاعات تماس</h3>
+                        <form method="post" action="{% url 'accounts:profile' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label style="display:block;margin-bottom:5px;color:#757575;">شماره تماس</label>
+                                <input type="text" name="phone" class="form-control" value="{{ profile.phone }}" style="width:100%;padding:10px 15px;border:1px solid #dcdcdc;border-radius:20px;">
+                            </div>
+                            <div class="form-group">
+                                <label style="display:block;margin-bottom:5px;color:#757575;">آدرس</label>
+                                <textarea name="address" class="form-control" rows="3" style="width:100%;padding:10px 15px;border:1px solid #dcdcdc;border-radius:10px;">{{ profile.address }}</textarea>
+                            </div>
+                            <button type="submit" class="btn-type3" style="width:100%;">ذخیره تغییرات</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top:20px;">
+                <a href="{% url 'orders:order_list' %}" class="btn-type2">مشاهده سفارش‌های من</a>
+            </div>
+
+            <br>
+            <br>
+            <br>
+        </div>
+    </div>
+</div>
+{% endblock %}

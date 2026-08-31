@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}جزئیات سفارش #{{ order.id }} | شون{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="heading" style="margin-bottom:30px;">سفارش #{{ order.id }}</h2>
+            
+            <div class="row">
+                <div class="col-md-8 col-xs-12">
+                    <div style="background:#fff;padding:30px;border-radius:10px;margin-bottom:30px;">
+                        <h3 style="font-size:18px;color:#494949;margin-bottom:20px;">اطلاعات سفارش</h3>
+                        
+                        <div style="display:flex;justify-content:space-between;margin-bottom:15px;padding-bottom:15px;border-bottom:1px solid #eee;">
+                            <span style="color:#757575;">تاریخ ثبت:</span>
+                            <strong style="color:#494949;">{{ order.created|date:"Y/m/d H:i" }}</strong>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:15px;padding-bottom:15px;border-bottom:1px solid #eee;">
+                            <span style="color:#757575;">وضعیت:</span>
+                            <span style="padding:5px 15px;border-radius:20px;
+                                {% if order.status == 'pending' %}background:#fff3cd;color:#856404;
+                                {% elif order.status == 'paid' %}background:#d4edda;color:#155724;
+                                {% elif order.status == 'processing' %}background:#cce5ff;color:#004085;
+                                {% elif order.status == 'shipped' %}background:#d1ecf1;color:#0c5460;
+                                {% elif order.status == 'delivered' %}background:#e2e3e5;color:#383d41;
+                                {% elif order.status == 'canceled' %}background:#f8d7da;color:#721c24;
+                                {% endif %}">
+                                {{ order.get_status_display_fa }}
+                            </span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:15px;padding-bottom:15px;border-bottom:1px solid #eee;">
+                            <span style="color:#757575;">آدرس تحویل:</span>
+                            <strong style="color:#494949;">{{ order.address }}</strong>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;">
+                            <span style="color:#757575;">جمع کل:</span>
+                            <strong style="color:#ff6060;font-size:20px;">{{ order.total_price }} تومان</strong>
+                        </div>
+                    </div>
+                    
+                    <div style="background:#fff;padding:30px;border-radius:10px;">
+                        <h3 style="font-size:18px;color:#494949;margin-bottom:20px;">اقلام سفارش</h3>
+                        
+                        {% for item in order.items.all %}
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;padding-bottom:15px;border-bottom:1px solid #eee;">
+                            <div style="display:flex;align-items:center;">
+                                {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width:60px;height:60px;object-fit:cover;margin-left:15px;border-radius:5px;" />
+                                {% endif %}
+                                <div>
+                                    <a href="{{ item.product.get_absolute_url }}" style="color:#494949;font-weight:700;">{{ item.product.name }}</a>
+                                    <br />
+                                    <small style="color:#a0a0a0;">{{ item.quantity }} عدد × {{ item.price }} تومان</small>
+                                </div>
+                            </div>
+                            <strong style="color:#494949;">{{ item.subtotal }} تومان</strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="col-md-4 col-xs-12">
+                    <div class="shop-widget filter-widget bg-grey" style="padding:30px;">
+                        <h2 style="font-size:18px;">عملیات</h2>
+                        <a href="{% url 'orders:order_list' %}" class="btn-type2" style="display:block;margin-bottom:10px;text-align:center;">بازگشت به لیست سفارش‌ها</a>
+                        <a href="{% url 'shop:product_list' %}" class="btn-type3" style="display:block;text-align:center;">ادامه خرید</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

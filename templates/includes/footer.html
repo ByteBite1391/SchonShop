@@ -1,0 +1,147 @@
+{% load static %}
+<footer id="mt-footer" class="style2 wow fadeInUp" data-wow-delay="0.4s">
+    <!-- F Promo Box -->
+    <aside class="f-promo-box dark">
+        <div class="container divider">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-3 mt-paddingbottomsm">
+                    <div class="f-widget-item">
+                        <span class="widget-icon"><i class="bi bi-airplane"></i></span>
+                        <div class="txt-holder">
+                            <h1 class="f-promo-box-heading">ارسال رایگان</h1>
+                            <p>ارسال رایگان برای تمام سفارش‌ها</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-3 mt-paddingbottomsm">
+                    <div class="f-widget-item">
+                        <span class="widget-icon"><i class="bi bi-headset"></i></span>
+                        <div class="txt-holder">
+                            <h1 class="f-promo-box-heading">پشتیبانی ۲۴/۷</h1>
+                            <p>پشتیبانی ۲۴ ساعته</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-3 mt-paddingbottomxs">
+                    <div class="f-widget-item">
+                        <span class="widget-icon"><i class="bi bi-gift"></i></span>
+                        <div class="txt-holder">
+                            <h1 class="f-promo-box-heading">کارت هدیه</h1>
+                            <p>هدیه‌ای عالی بدهید</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-3">
+                    <div class="f-widget-item">
+                        <span class="widget-icon"><i class="bi bi-shield-check"></i></span>
+                        <div class="txt-holder">
+                            <h1 class="f-promo-box-heading">پرداخت ۱۰۰٪ امن</h1>
+                            <p>پرداخت امن</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Footer Holder -->
+    <div class="footer-holder dark">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-5 col-md-4 mt-paddingbottomxs">
+                    <div class="f-widget-about">
+                        <div class="logo">
+                            <a href="{% url 'shop:home' %}">
+                                <img src="{% static 'images/logo.png' %}" alt="Schon" />
+                            </a>
+                        </div>
+                        <p>فروشگاه اینترنتی مبلمان و لوازم خانگی</p>
+                        <ul class="list-unstyled address-list">
+                            <li>
+                                <i class="bi bi-geo-alt"></i>
+                                <address>تهران، مجمتع فنی تهران شعبه انقلاب</address>
+                            </li>
+                            <li>
+                                <i class="bi bi-telephone"></i>
+                                <a href="tel:15553332211">‎+989103305536</a>
+                            </li>
+                            <li>
+                                <i class="bi bi-envelope"></i>
+                                <a href="mailto:amiralipourbabaeiiportolio@gmail.com">amiralipourbabaeiiportolio@gmail.com</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <nav class="col-xs-12 col-sm-7 col-md-5 mt-paddingbottomxs">
+                    <div class="nav-widget-1">
+                        <h3 class="f-widget-heading">دسته‌بندی‌ها</h3>
+                        <ul class="list-unstyled f-widget-nav">
+                            {% for category in categories|slice:":6" %}
+                            <li><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="nav-widget-1">
+                        <h3 class="f-widget-heading">اطلاعات</h3>
+                        <ul class="list-unstyled f-widget-nav">
+                            <li><a href="#">درباره ما</a></li>
+                            <li><a href="#">تماس با ما</a></li>
+                            <li><a href="#">شرایط و ضوابط</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-widget-1">
+                        <h3 class="f-widget-heading">حساب کاربری</h3>
+                        <ul class="list-unstyled f-widget-nav">
+                            {% if user.is_authenticated %}
+                            <li><a href="{% url 'accounts:profile' %}">حساب من</a></li>
+                            <li><a href="{% url 'orders:order_list' %}">پیگیری سفارش</a></li>
+                            {% else %}
+                            <li><a href="{% url 'account_login' %}">ورود</a></li>
+                            <li><a href="{% url 'account_signup' %}">ثبت‌نام</a></li>
+                            {% endif %}
+                            <li><a href="{% url 'cart:cart_detail' %}">سبد خرید</a></li>
+                        </ul>
+                    </div>
+                </nav>
+                
+                <!-- <div class="col-xs-12 col-md-3 text-right hidden-sm">
+                    <div class="f-widget-newsletter">
+                        <h3 class="f-widget-heading">عضویت در خبرنامه</h3>
+                        <div class="holder">
+                            <form class="newsletter-form form2" action="#">
+                                <fieldset>
+                                    <input type="email" class="form-control" placeholder="ایمیل شما" />
+                                    <button type="submit">اشتراک</button>
+                                </fieldset>
+                            </form>
+                        </div>
+                        <h4 class="f-widget-heading follow">دنبال کنید</h4>
+                        <ul class="list-unstyled social-network social-icon">
+                            <li><a href="#"><i class="bi bi-twitter"></i></a></li>
+                            <li><a href="#"><i class="bi bi-facebook"></i></a></li>
+                            <li><a href="#"><i class="bi bi-google"></i></a></li>
+                            <li><a href="#"><i class="bi bi-youtube"></i></a></li>
+                        </ul>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer Area -->
+    <div class="footer-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <p>© <a href="{% url 'shop:home' %}">شون</a> - تمامی حقوق محفوظ است - ساخته شده توسط <a href="https://bytebite1391.github.io/Portfolio">امیرعلی پوربابائی</a></p> 
+                </div>
+                <div class="col-xs-12 col-sm-6 text-right">
+                    <div class="bank-card">
+                        <img src="{% static 'images/bank-card.png' %}" alt="کارت بانکی" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}تسویه حساب | شون{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="heading" style="margin-bottom:30px;">تسویه حساب</h2>
+            
+            <div class="row">
+                <div class="col-md-8 col-xs-12">
+                    <div class="mt-detail-sec" style="padding:20px 0;">
+                        <form method="post" action="{% url 'orders:checkout' %}">
+                            {% csrf_token %}
+                            <div class="bill-detail">
+                                <h2 style="font-size:18px;color:#494949;margin-bottom:20px;">اطلاعات ارسال</h2>
+                                
+                                <div class="form-group">
+                                    <label style="display:block;margin-bottom:5px;color:#757575;">شماره تماس</label>
+                                    <input type="text" name="phone" class="form-control" value="{{ profile.phone }}" required style="width:100%;padding:10px 15px;border:1px solid #dcdcdc;border-radius:20px;">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label style="display:block;margin-bottom:5px;color:#757575;">آدرس تحویل</label>
+                                    <textarea name="address" class="form-control" rows="4" required style="width:100%;padding:10px 15px;border:1px solid #dcdcdc;border-radius:10px;">{{ profile.address }}</textarea>
+                                </div>
+                                
+                                <button type="submit" class="btn-type3" style="width:100%;padding:15px;font-size:16px;">
+                                    ثبت نهایی سفارش
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 col-xs-12">
+                    <div class="shop-widget filter-widget bg-grey" style="padding:30px;">
+                        <h2 style="font-size:18px;">خلاصه سفارش</h2>
+                        
+                        {% for item in cart %}
+                        <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #eee;">
+                            <span style="color:#757575;">{{ item.product.name }} ({{ item.quantity }})</span>
+                            <span style="color:#494949;font-weight:700;">{{ item.total_price }} تومان</span>
+                        </div>
+                        {% endfor %}
+                        
+                        <div style="display:flex;justify-content:space-between;margin-top:20px;padding-top:15px;border-top:2px solid #ddd;">
+                            <strong style="color:#494949;">جمع کل:</strong>
+                            <strong style="color:#ff6060;font-size:18px;">{{ cart.get_total_price }} تومان</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

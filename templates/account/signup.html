@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}ثبت‌نام | شون{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+            <div style="background:#fff;padding:40px;border-radius:10px;margin-top:50px;">
+                <h2 class="text-center" style="color:#494949;margin-bottom:30px;">ایجاد حساب کاربری</h2>
+                
+                {% if form.errors %}
+                <div class="alert alert-danger" style="padding:15px;border-radius:5px;margin-bottom:20px;background:#f8d7da;color:#721c24;">
+                    لطفاً اطلاعات را صحیح وارد کنید.
+                </div>
+                {% endif %}
+                
+                <form method="post" action="{% url 'account_signup' %}">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label style="display:block;margin-bottom:5px;color:#757575;">ایمیل</label>
+                        <input type="email" name="email" class="form-control" placeholder="ایمیل خود را وارد کنید" required style="width:100%;padding:12px 15px;border:1px solid #dcdcdc;border-radius:20px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display:block;margin-bottom:5px;color:#757575;">رمز عبور</label>
+                        <input type="password" name="password1" class="form-control" placeholder="رمز عبور" required style="width:100%;padding:12px 15px;border:1px solid #dcdcdc;border-radius:20px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display:block;margin-bottom:5px;color:#757575;">تکرار رمز عبور</label>
+                        <input type="password" name="password2" class="form-control" placeholder="تکرار رمز عبور" required style="width:100%;padding:12px 15px;border:1px solid #dcdcdc;border-radius:20px;">
+                    </div>
+                    
+                    <button type="submit" class="btn-type3" style="width:100%;padding:12px;font-size:16px;">ثبت‌نام</button>
+                </form>
+                
+                <div class="text-center" style="margin-top:20px;">
+                    <a href="{% url 'account_login' %}" style="color:#757575;">قبلاً ثبت‌نام کرده‌اید؟ ورود</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

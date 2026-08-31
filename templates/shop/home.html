@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}شون | قالب HTML5 فروشگاهی{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- Featured Products -->
+            <div class="mt-producttabs style2 wow fadeInUp" data-wow-delay="0.4s">
+                <h2 class="heading" style="text-align:center;margin-bottom:30px;">محصولات ویژه</h2>
+                <div class="tab-content">
+                    <div id="tab1">
+                        <div class="row">
+                            {% for product in featured_products %}
+                            <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:30px;">
+                                <div class="mt-product1" style="width:100%;">
+                                    <div class="box">
+                                        <div class="b1">
+                                            <div class="b2">
+                                                <a href="{{ product.get_absolute_url }}">
+                                                    {% if product.image %}
+                                                    <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+                                                    {% else %}
+                                                    <img src="http://placehold.it/275x290" alt="{{ product.name }}" />
+                                                    {% endif %}
+                                                </a>
+                                                <ul class="links">
+                                                    {% if product.stock > 0 %}
+                                                    <li>
+                                                        <a href="{% url 'cart:cart_add' product.id %}" onclick="event.preventDefault(); document.getElementById('add-form-{{ product.id }}').submit();">
+                                                            <i class="icon-handbag"></i><span>افزودن به سبد</span>
+                                                        </a>
+                                                        <form id="add-form-{{ product.id }}" method="post" action="{% url 'cart:cart_add' product.id %}" style="display:none;">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="quantity" value="1">
+                                                        </form>
+                                                    </li>
+                                                    {% endif %}
+                                                    <li>
+                                                        <a href="{{ product.get_absolute_url }}"><i class="fa fa-eye"></i></a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="txt">
+                                        <strong class="title">
+                                            <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                                        </strong>
+                                        <span class="price">
+                                            <span>{{ product.price }} تومان</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-xs-12">
+                                <p style="text-align:center;color:#757575;">محصولی یافت نشد.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Best Sellers -->
+            <div class="mt-producttabs style3 wow fadeInUp" data-wow-delay="0.4s" style="margin:40px 0;">
+                <h2 class="heading" style="text-align:center;margin-bottom:30px;">پرفروش‌ترین‌ها</h2>
+                <div class="row">
+                    {% for product in best_sellers %}
+                    <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:30px;">
+                        <div class="mt-product1" style="width:100%;">
+                            <div class="box">
+                                <div class="b1">
+                                    <div class="b2">
+                                        <a href="{{ product.get_absolute_url }}">
+                                            {% if product.image %}
+                                            <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+                                            {% else %}
+                                            <img src="http://placehold.it/215x215" alt="{{ product.name }}" />
+                                            {% endif %}
+                                        </a>
+                                        <span class="caption">
+                                            <span class="new">پرفروش</span>
+                                        </span>
+                                        <ul class="links">
+                                            {% if product.stock > 0 %}
+                                            <li>
+                                                <a href="{% url 'cart:cart_add' product.id %}" onclick="event.preventDefault(); document.getElementById('best-form-{{ product.id }}').submit();">
+                                                    <i class="icon-handbag"></i><span>افزودن به سبد</span>
+                                                </a>
+                                                <form id="best-form-{{ product.id }}" method="post" action="{% url 'cart:cart_add' product.id %}" style="display:none;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="quantity" value="1">
+                                                </form>
+                                            </li>
+                                            {% endif %}
+                                            <li>
+                                                <a href="{{ product.get_absolute_url }}"><i class="fa fa-eye"></i></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="txt">
+                                <strong class="title">
+                                    <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                                </strong>
+                                <span class="price">
+                                    <span>{{ product.price }} تومان</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-xs-12">
+                        <p style="text-align:center;color:#757575;">محصولی یافت نشد.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* اطمینان از نمایش درست محصولات */
+    .mt-product1 {
+        width: 100%;
+        display: block;
+        margin: 0;
+    }
+    
+    .mt-product1 .box {
+        margin-bottom: 10px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .mt-product1 .b1 {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .mt-product1 .b2 {
+        display: block;
+    }
+    
+    .mt-product1 .b2 img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .mt-product1 .txt {
+        text-align: center;
+        padding: 10px;
+    }
+    
+    .mt-product1 .title {
+        display: block;
+        margin-bottom: 10px;
+    }
+    
+    .mt-product1 .title a {
+        font-size: 16px;
+        font-weight: 600;
+        color: #757575;
+        text-decoration: none;
+    }
+    
+    .mt-product1 .price {
+        font-size: 18px;
+        font-weight: 700;
+        color: #010101;
+        display: block;
+    }
+    
+    .mt-product1 .links {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .mt-product1 .links li {
+        display: inline-block;
+    }
+    
+    .mt-product1 .links a {
+        display: inline-block;
+        padding: 8px 15px;
+        background: #fff;
+        color: #8a8a8a;
+        border-radius: 3px;
+        text-decoration: none;
+        font-size: 14px;
+    }
+    
+    .mt-product1 .links a:hover {
+        color: #ff6060;
+    }
+    
+    .mt-product1 .caption {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    
+    .mt-product1 .caption .new {
+        display: block;
+        background: #000;
+        color: #fff;
+        padding: 3px 8px;
+        font-size: 12px;
+        border-radius: 3px;
+    }
+    
+    .heading {
+        font-size: 26px;
+        color: #3a3a3a;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+    
+    /* نمایش سه ستونه */
+    @media (min-width: 992px) {
+        .col-md-3 {
+            width: 25%;
+            float: right;
+        }
+        .col-md-4 {
+            width: 33.333%;
+            float: right;
+        }
+    }
+    
+    @media (min-width: 768px) and (max-width: 991px) {
+        .col-sm-6 {
+            width: 50%;
+            float: right;
+        }
+    }
+    
+    @media (max-width: 767px) {
+        .col-xs-12 {
+            width: 100%;
+            float: none;
+        }
+    }
+    
+    /* Clearfix */
+    .row::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+</style>
+{% endblock %}

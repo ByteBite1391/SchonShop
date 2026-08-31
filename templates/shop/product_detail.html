@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} | شون{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="mt-product-detial">
+                <div class="slider">
+                    <div class="product-slider">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+                        {% else %}
+                        <img src="http://placehold.it/600x600" alt="{{ product.name }}" />
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Share and Actions -->
+                    <ul class="comment-list" style="list-style:none;padding:0;margin:20px 0;display:flex;gap:20px;">
+                        <li>
+                            <a href="#" onclick="copyProductLink(event)" style="color:#b6b6b6;text-decoration:none;">
+                                <i class="fa fa-share-alt"></i> اشتراک‌گذاری
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://wa.me/?text={{ request.build_absolute_uri }}" target="_blank" style="color:#b6b6b6;text-decoration:none;">
+                                <i class="fa fa-whatsapp"></i> واتساپ
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://t.me/share/url?url={{ request.build_absolute_uri }}&text={{ product.name }}" target="_blank" style="color:#b6b6b6;text-decoration:none;">
+                                <i class="fa fa-telegram"></i> تلگرام
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ product.name }}" target="_blank" style="color:#b6b6b6;text-decoration:none;">
+                                <i class="fa fa-twitter"></i> توییتر
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="detial-holder">
+                    <h2>{{ product.name }}</h2>
+                    
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumbs">
+                        <ul style="list-style:none;padding:0;margin:0;display:flex;gap:10px;flex-wrap:wrap;">
+                            <li><a href="{% url 'shop:home' %}">خانه</a></li>
+                            <li><i class="fa fa-angle-right"></i></li>
+                            <li><a href="{% url 'shop:product_list' %}">محصولات</a></li>
+                            <li><i class="fa fa-angle-right"></i></li>
+                            <li><a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Rating -->
+                    <div class="rank-rating" style="margin:15px 0;">
+                        <span style="color:#e6c376;">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star-o"></i>
+                        </span>
+                        <span style="color:#b6b6b6;margin-right:10px;">(4.0 از 5)</span>
+                    </div>
+                    
+                    <!-- Stock Status -->
+                    <div style="margin:15px 0;">
+                        {% if product.stock > 0 %}
+                        <span style="color:#28a745;">
+                            <i class="fa fa-check-circle"></i>
+                            موجود در انبار ({{ product.stock }} عدد)
+                        </span>
+                        {% else %}
+                        <span style="color:#dc3545;">
+                            <i class="fa fa-times-circle"></i>
+                            ناموجود
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="txt-wrap" style="margin:20px 0;">
+                        <p style="line-height:1.8;color:#757575;">{{ product.description|linebreaks }}</p>
+                    </div>
+                    
+                    <!-- Price -->
+                    <div class="text-holder" style="margin:20px 0;">
+                        <span class="price" style="font-size:28px;font-weight:700;color:#000;">{{ product.price }} تومان</span>
+                    </div>
+                    
+                    <!-- Add to Cart -->
+                    {% if product.stock > 0 %}
+                    <div class="product-form" style="margin:20px 0;">
+                        <form method="post" action="{% url 'cart:cart_add' product.id %}" style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;">
+                            {% csrf_token %}
+                            <label for="quantity" style="color:#757575;">تعداد:</label>
+                            <select name="quantity" id="quantity" style="padding:10px 15px;border:1px solid #ddd;border-radius:20px;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                            <button type="submit" style="background:#ff6060;color:#fff;border:none;padding:12px 30px;border-radius:25px;cursor:pointer;font-size:16px;">
+                                <i class="fa fa-shopping-cart"></i>
+                                افزودن به سبد خرید
+                            </button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div style="margin:20px 0;padding:15px;background:#f8d7da;color:#721c24;border-radius:5px;">
+                        این محصول در حال حاضر موجود نیست.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Related Products -->
+            {% if related_products %}
+            <div class="related-products" style="margin-top:50px;">
+                <h2 style="font-size:24px;color:#3a3a3a;margin-bottom:30px;">محصولات مرتبط</h2>
+                <div class="row">
+                    {% for related in related_products %}
+                    <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:30px;">
+                        <div class="mt-product1" style="width:100%;">
+                            <div class="box">
+                                <div class="b1">
+                                    <div class="b2">
+                                        <a href="{{ related.get_absolute_url }}">
+                                            {% if related.image %}
+                                            <img src="{{ related.image.url }}" alt="{{ related.name }}" />
+                                            {% else %}
+                                            <img src="http://placehold.it/215x215" alt="{{ related.name }}" />
+                                            {% endif %}
+                                        </a>
+                                        <ul class="links" style="list-style:none;padding:0;margin:0;display:flex;justify-content:center;gap:10px;position:absolute;bottom:10px;left:10px;right:10px;">
+                                            {% if related.stock > 0 %}
+                                            <li>
+                                                <a href="{% url 'cart:cart_add' related.id %}" onclick="event.preventDefault(); document.getElementById('rel-form-{{ related.id }}').submit();" style="background:#fff;color:#8a8a8a;padding:8px 15px;border-radius:3px;text-decoration:none;">
+                                                    <i class="fa fa-shopping-cart"></i>
+                                                </a>
+                                                <form id="rel-form-{{ related.id }}" method="post" action="{% url 'cart:cart_add' related.id %}" style="display:none;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="quantity" value="1">
+                                                </form>
+                                            </li>
+                                            {% endif %}
+                                            <li>
+                                                <a href="{{ related.get_absolute_url }}" style="background:#fff;color:#8a8a8a;padding:8px 15px;border-radius:3px;text-decoration:none;">
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="txt" style="text-align:center;padding:10px;">
+                                <strong class="title">
+                                    <a href="{{ related.get_absolute_url }}" style="color:#757575;font-size:14px;">{{ related.name }}</a>
+                                </strong>
+                                <span class="price" style="font-weight:700;color:#000;display:block;">{{ related.price }} تومان</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" style="display:none;position:fixed;bottom:30px;right:30px;background:#28a745;color:#fff;padding:15px 25px;border-radius:5px;z-index:9999;box-shadow:0 5px 15px rgba(0,0,0,0.3);">
+    لینک محصول کپی شد!
+</div>
+
+<style>
+    .mt-product-detial {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        background: #f6f6f6;
+        padding: 30px;
+        border-radius: 10px;
+    }
+    
+    .mt-product-detial .slider {
+        flex: 1;
+        min-width: 300px;
+        max-width: 500px;
+    }
+    
+    .mt-product-detial .slider img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        display: block;
+    }
+    
+    .mt-product-detial .detial-holder {
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .mt-product-detial h2 {
+        font-size: 28px;
+        color: #000;
+        margin-bottom: 15px;
+    }
+    
+    .comment-list a {
+        transition: color 0.3s;
+    }
+    
+    .comment-list a:hover {
+        color: #ff6060 !important;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .mt-product-detial {
+            flex-direction: column;
+            padding: 15px;
+        }
+        
+        .mt-product-detial .slider {
+            max-width: 100%;
+        }
+    }
+</style>
+
+<script>
+function copyProductLink(event) {
+    event.preventDefault();
+    
+    // Get current URL
+    const currentUrl = window.location.href;
+    
+    // Copy to clipboard
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(currentUrl).then(function() {
+            showToast();
+        }).catch(function() {
+            fallbackCopy(currentUrl);
+        });
+    } else {
+        fallbackCopy(currentUrl);
+    }
+}
+
+function fallbackCopy(text) {
+    // Fallback for older browsers
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        showToast();
+    } catch (err) {
+        alert('لطفاً لینک را دستی کپی کنید: ' + text);
+    }
+    document.body.removeChild(textarea);
+}
+
+function showToast() {
+    const toast = document.getElementById('toast');
+    toast.style.display = 'block';
+    
+    setTimeout(function() {
+        toast.style.display = 'none';
+    }, 3000);
+}
+</script>
+{% endblock %}

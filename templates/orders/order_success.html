@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}سفارش موفق | شون{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="text-center" style="padding:60px 0;">
+                <i class="fa fa-check-circle" style="font-size:80px;color:#28a745;margin-bottom:30px;"></i>
+                <h1 style="font-size:32px;color:#494949;margin-bottom:20px;">سفارش شما با موفقیت ثبت شد!</h1>
+                
+                <div style="background:#f8f8f8;padding:30px;border-radius:10px;max-width:500px;margin:0 auto;">
+                    <p style="margin-bottom:15px;color:#757575;">
+                        شماره سفارش: <strong style="color:#494949;">#{{ order.id }}</strong>
+                    </p>
+                    <p style="margin-bottom:15px;color:#757575;">
+                        تاریخ ثبت: <strong style="color:#494949;">{{ order.created|date:"Y/m/d H:i" }}</strong>
+                    </p>
+                    <p style="margin-bottom:15px;color:#757575;">
+                        مبلغ کل: <strong style="color:#ff6060;font-size:18px;">{{ order.total_price }} تومان</strong>
+                    </p>
+                    <p style="margin-bottom:0;color:#757575;">
+                        وضعیت: 
+                        <span style="background:#fff3cd;color:#856404;padding:5px 15px;border-radius:20px;">{{ order.get_status_display_fa }}</span>
+                    </p>
+                </div>
+                
+                <div style="margin-top:30px;">
+                    <a href="{% url 'orders:order_detail' order.id %}" class="btn-type3" style="margin-left:10px;">مشاهده جزئیات سفارش</a>
+                    <a href="{% url 'shop:product_list' %}" class="btn-type2">ادامه خرید</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

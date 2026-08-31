@@ -1,0 +1,58 @@
+/* static/css/font.css */
+
+/* Import Vazirmatn Font */
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* فقط روی عناصر متنی فونت بذار */
+html, body {
+    font-family: 'Vazirmatn', sans-serif !important;
+}
+
+h1, h2, h3, h4, h5, h6,
+p, a, span, div, button, 
+input, select, textarea, label, 
+li, strong, em, small, td, th {
+    font-family: 'Vazirmatn', sans-serif !important;
+}
+
+/* آیکون‌های Font Awesome */
+.fa,
+.fas,
+.far,
+.fab,
+.fal,
+.fad,
+.fa-solid,
+.fa-regular,
+.fa-brands,
+.fa-light,
+.fa-thin,
+.fa-duotone {
+    font-family: "Font Awesome 6 Free" !important;
+}
+
+.fab,
+.fa-brands {
+    font-family: "Font Awesome 6 Brands" !important;
+}
+
+/* آیکون‌های fontello (icon-handbag, icon-eye و...) */
+.icon-handbag,
+.icon-magnifier,
+.icon-microphone,
+.icon-shop,
+.icon-euro,
+.icon-heart-empty,
+.icon-exchange,
+.icon-eye,
+[class^="icon-"]:before,
+[class*=" icon-"]:before {
+    font-family: "fontello" !important;
+}
+
+/* آیکون‌های icomoon */
+.icomoon,
+[class^="icomoon"]:before,
+[class*=" icomoon"]:before {
+    font-family: "icomoon" !important;
+}

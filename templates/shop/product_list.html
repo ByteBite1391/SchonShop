@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}محصولات | شون{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- Shop List Header -->
+            <div class="mt-shoplist-header">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-8">
+                        <div class="mt-textbox">
+                            <p>
+                                {% if query %}
+                                نتایج جستجو برای "{{ query }}"
+                                {% elif current_category %}
+                                دسته‌بندی: {{ current_category }}
+                                {% else %}
+                                همه محصولات
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-4">
+                        <div class="btn-box text-right">
+                            <form method="get" action="{% url 'shop:product_list' %}" style="display:inline;">
+                                <select name="sort" class="drop-link" style="padding:12px 20px;border-radius:20px;border:1px solid #d8d8d8;color:#a5a5a5;font:14px/1 'Source Sans Pro',sans-serif;background:#fff;" onchange="this.form.submit()">
+                                    <option value="">مرتب‌سازی پیش‌فرض</option>
+                                    <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>ارزان‌ترین</option>
+                                    <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>گران‌ترین</option>
+                                    <option value="newest" {% if sort == 'newest' %}selected{% endif %}>جدیدترین</option>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-3 col-xs-12">
+                    <aside id="sidebar">
+                        <div class="shop-widget filter-widget bg-grey" style="padding:20px;">
+                            <h2 style="font-size:18px;">فیلتر محصولات</h2>
+                            <form method="get" action="{% url 'shop:product_list' %}">
+                                <div class="form-group">
+                                    <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="جستجو..." style="border-radius:20px;padding:10px 20px;border:1px solid #dcdcdc;margin-bottom:10px;">
+                                </div>
+                                <div class="form-group">
+                                    <select name="category" class="form-control" style="border-radius:20px;padding:10px 20px;border:1px solid #dcdcdc;margin-bottom:10px;">
+                                        <option value="">همه دسته‌ها</option>
+                                        {% for category in categories %}
+                                        <option value="{{ category.slug }}" {% if current_category == category.slug %}selected{% endif %}>{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" name="min_price" class="form-control" value="{{ min_price }}" placeholder="حداقل قیمت" style="border-radius:20px;padding:10px 20px;border:1px solid #dcdcdc;margin-bottom:10px;">
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" name="max_price" class="form-control" value="{{ max_price }}" placeholder="حداکثر قیمت" style="border-radius:20px;padding:10px 20px;border:1px solid #dcdcdc;margin-bottom:10px;">
+                                </div>
+                                <button type="submit" class="btn-type3" style="width:100%;">اعمال فیلتر</button>
+                            </form>
+                        </div>
+                    </aside>
+                </div>
+                
+                <!-- Products -->
+                <div class="col-md-9 col-xs-12">
+                    <div class="row">
+                        {% for product in products %}
+                        <div class="col-md-4 col-sm-6 col-xs-12" style="margin-bottom:30px;">
+                            <div class="mt-product1" style="width:100%;">
+                                <div class="box">
+                                    <div class="b1">
+                                        <div class="b2">
+                                            <a href="{{ product.get_absolute_url }}">
+                                                {% if product.image %}
+                                                <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+                                                {% else %}
+                                                <img src="http://placehold.it/215x215" alt="{{ product.name }}" />
+                                                {% endif %}
+                                            </a>
+                                            {% if product.stock == 0 %}
+                                            <span class="caption">
+                                                <span class="off">ناموجود</span>
+                                            </span>
+                                            {% endif %}
+                                            <ul class="links">
+                                                {% if product.stock > 0 %}
+                                                <li>
+                                                    <a href="{% url 'cart:cart_add' product.id %}" onclick="event.preventDefault(); document.getElementById('add-form-{{ product.id }}').submit();">
+                                                        <i class="icon-handbag"></i><span>افزودن به سبد</span>
+                                                    </a>
+                                                    <form id="add-form-{{ product.id }}" method="post" action="{% url 'cart:cart_add' product.id %}" style="display:none;">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="quantity" value="1">
+                                                    </form>
+                                                </li>
+                                                {% endif %}
+                                                <li><a href="{{ product.get_absolute_url }}"><i class="fa fa-eye"></i></a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="txt">
+                                    <strong class="title">
+                                        <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                                    </strong>
+                                    <span class="price">
+                                        {% comment %} <i class="fa fa-eur"></i>  {% endcomment %}
+                                        <span>{{ product.price }} تومان</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-xs-12">
+                            <div class="alert alert-info" style="text-align:center;padding:30px;">
+                                هیچ محصولی یافت نشد.
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                    <div class="mt-pagination" style="text-align:center;margin-top:20px;">
+                        <ul style="display:inline-block;list-style:none;padding:0;">
+                            {% if page_obj.has_previous %}
+                            <li style="display:inline-block;margin:0 5px;">
+                                <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" style="padding:8px 15px;background:#f6f6f6;color:#757575;border-radius:3px;">قبلی</a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                            <li style="display:inline-block;margin:0 5px;">
+                                {% if page_obj.number == num %}
+                                <span style="padding:8px 15px;background:#ff6060;color:#fff;border-radius:3px;">{{ num }}</span>
+                                {% else %}
+                                <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" style="padding:8px 15px;background:#f6f6f6;color:#757575;border-radius:3px;">{{ num }}</a>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                            <li style="display:inline-block;margin:0 5px;">
+                                <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" style="padding:8px 15px;background:#f6f6f6;color:#757575;border-radius:3px;">بعدی</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* اطمینان از نمایش درست محصولات */
+    .mt-product1 {
+        width: 100%;
+        display: block;
+        margin: 0;
+    }
+    
+    .mt-product1 .box {
+        margin-bottom: 10px;
+    }
+    
+    .mt-product1 .b1 {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .mt-product1 .b2 {
+        display: block;
+    }
+    
+    .mt-product1 .b2 img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .mt-product1 .txt {
+        text-align: center;
+        padding: 10px;
+    }
+    
+    /* نمایش سه ستونه محصولات */
+    @media (min-width: 992px) {
+        .col-md-4 {
+            width: 33.333%;
+            float: right;
+        }
+    }
+    
+    @media (min-width: 768px) and (max-width: 991px) {
+        .col-sm-6 {
+            width: 50%;
+            float: right;
+        }
+    }
+    
+    @media (max-width: 767px) {
+        .col-xs-12 {
+            width: 100%;
+            float: none;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% load static %}
+<header id="mt-header" class="style3">
+    <!-- mt top bar start here -->
+    <div class="mt-top-bar">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 hidden-xs">
+                    <span class="tel active">
+                        <i class="bi bi-telephone" aria-hidden="true"></i> ‎+989103305536
+                    </span>
+                    <a class="tel" href="mailto:amiralipourbabaeiiportolio@gmail.com">
+                        <i class="bi bi-envelope" aria-hidden="true"></i>
+                        amiralipourbabaeiiportolio@gmail.com
+                    </a>
+                </div>
+                <div class="col-xs-12 col-sm-6 text-right">
+                    <ul class="mt-top-list">
+                        <li><a href="{% url 'orders:order_list' %}">پیگیری سفارش</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'accounts:profile' %}">حساب من</a></li>
+                        <li>
+                            <form method="post" action="{% url 'account_logout' %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" style="background:none;border:none;color:#a1a1a1;cursor:pointer;padding:9px 19px;">خروج</button>
+                            </form>
+                        </li>
+                        {% else %}
+                        <li><a href="{% url 'account_login' %}">ورود</a></li>
+                        <li class="active"><a href="{% url 'account_signup' %}">ثبت‌نام</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- mt top bar end here -->
+    
+    <!-- mt bottom bar start here -->
+    <div class="mt-bottom-bar">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <!-- mt logo start here -->
+                    <div class="mt-logo">
+                        <a href="{% url 'shop:home' %}">
+                            <img src="{% static 'images/mt-logo.png' %}" alt="schon" />
+                        </a>
+                    </div>
+                    <!-- mt sh cart start here -->
+                    <div class="mt-sh-cart">
+                        <a href="{% url 'cart:cart_detail' %}">
+                            <i class="bi bi-bag"></i>
+                            <strong>سبد خرید</strong>
+                            {% if cart|length > 0 %}
+                            <span>{{ cart|length }} کالا | {{ cart.get_total_price }} تومان</span>
+                            {% else %}
+                            <span>سبد خرید خالی است</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                    <!-- mt sh cart end here -->
+                    
+                    <!-- mt icon list start here -->
+                    <ul class="mt-icon-list">
+                        <li class="hidden-lg hidden-md">
+                            <a href="#" class="bar-opener mobile-toggle">
+                                <span class="bar"></span>
+                                <span class="bar small"></span>
+                                <span class="bar"></span>
+                            </a>
+                        </li>
+                        <li><a href="#" class="icon-magnifier search-opener"><i class="bi bi-search"></i></a></li>
+                    </ul>
+                    <!-- mt icon list end here -->
+                    
+                    <!-- navigation start here -->
+                    <nav id="nav">
+                        <ul>
+                            <li>
+                                <a href="{% url 'shop:home' %}">خانه</a>
+                            </li>
+                            <li class="drop">
+                                <a href="{% url 'shop:product_list' %}">
+                                    محصولات
+                                    <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                                </a>
+                                <div class="mt-dropmenu text-left">
+                                    <div class="mt-frame">
+                                        <div class="mt-f-box">
+                                            {% for category in categories %}
+                                            <div class="mt-col-3">
+                                                <div class="sub-dropcont">
+                                                    <strong class="title">
+                                                        <a href="{{ category.get_absolute_url }}">{{ category.name }}</a>
+                                                    </strong>
+                                                    <div class="sub-drop">
+                                                        <ul>
+                                                            <li><a href="{{ category.get_absolute_url }}">مشاهده همه</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="mt-mdropover"></span>
+                            </li>
+                            <li><a href="{% url 'accounts:profile' %}">حساب کاربری</a></li>
+                            <li><a href="{% url 'cart:cart_detail' %}">سبد خرید</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- mt bottom bar end here -->
+    <span class="mt-side-over"></span>
+</header>
+
+<!-- mt search popup start here -->
+<div class="mt-search-popup">
+    <div class="mt-holder">
+        <a href="#" class="search-close"><span></span><span></span></a>
+        <div class="mt-frame">
+            <form action="{% url 'shop:product_list' %}" method="get">
+                <fieldset>
+                    <input type="text" name="q" placeholder="جستجو..." />
+                    <button class="icon-magnifier" type="submit"><i class="bi bi-search"></i></button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- mt search popup end here -->

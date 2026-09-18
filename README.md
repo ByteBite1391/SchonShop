@@ -49,8 +49,8 @@
 #### ۱. کلون کردن پروژه
 
 ```bash
-git clone https://github.com/yourusername/shop.git
-cd shop
+git clone https://github.com/ByteBite1391/SchonShop.git
+cd SchonShop
 ```
 
 #### ۲. ساخت محیط مجازی

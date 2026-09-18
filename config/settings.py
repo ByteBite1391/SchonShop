@@ -24,11 +24,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     
     # Third party
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    
+    'storages',
     
     # Local apps
     'shop',
@@ -70,8 +73,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
-
+# ========== Database ==========
 if os.environ.get('DB_ENGINE') == 'django.db.backends.sqlite3':
     DATABASES = {
         'default': {
@@ -90,9 +92,8 @@ else:
             'PORT': os.environ.get('DB_PORT', '5432'),
         }
     }
-    
-# Authentication
 
+# ========== Authentication ==========
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -113,18 +114,16 @@ TIME_ZONE = 'Asia/Tehran'
 USE_I18N = True
 USE_TZ = True
 
+# ========== Static Files ==========
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Allauth settings
+# ========== Allauth Settings ==========
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
@@ -139,7 +138,7 @@ ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 LOGIN_REDIRECT_URL = 'shop:home'
 LOGOUT_REDIRECT_URL = 'shop:home'
 
-# Messages
+# ========== Messages ==========
 MESSAGE_TAGS = {
     messages.DEBUG: 'debug',
     messages.INFO: 'info',
@@ -148,10 +147,10 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-# Cart
+# ========== Cart ==========
 CART_SESSION_ID = 'cart'
 
-# Jazzmin Settings (English)
+# ========== Jazzmin Settings ==========
 JAZZMIN_SETTINGS = {
     "site_title": "Shop Admin",
     "site_header": "Shop Management Panel",
@@ -218,3 +217,45 @@ JAZZMIN_UI_TWEAKS = {
         "success": "btn-success",
     },
 }
+
+# ========== ArvanCloud Object Storage ==========
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL', 'https://s3.ir-tbz-sh1.arvanstorage.ir')
+AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'ir-tbz-sh1')
+
+# تنظیمات اضافی S3
+AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_FILE_OVERWRITE = False
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+# Custom domain برای دسترسی مستقیم به فایل‌ها
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.arvanstorage.ir'
+
+# استفاده از Object Storage برای media
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "access_key": AWS_ACCESS_KEY_ID,
+            "secret_key": AWS_SECRET_ACCESS_KEY,
+            "bucket_name": AWS_STORAGE_BUCKET_NAME,
+            "endpoint_url": AWS_S3_ENDPOINT_URL,
+            "region_name": AWS_S3_REGION_NAME,
+            "default_acl": AWS_DEFAULT_ACL,
+            "file_overwrite": AWS_S3_FILE_OVERWRITE,
+            "querystring_auth": AWS_QUERYSTRING_AUTH,
+            "location": "media",
+            "custom_domain": AWS_S3_CUSTOM_DOMAIN,
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'

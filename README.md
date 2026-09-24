@@ -6,7 +6,9 @@
 
 ## نویسنده
 
-محمد حسن خدامی
+امیرعلی پوربابایی
+
+**استاد:** محمد حسن خدامی
 
 ---
 
@@ -16,7 +18,7 @@
 
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg> Django 6.1
 
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg> django-allauth (احراز هویت با ایمیل)
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg> django-allauth (احراز هویت با ایمیل)
 
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> django-filter (فیلتر محصولات)
 
@@ -42,6 +44,7 @@ products = products.filter(name__icontains=query)
 
 # فیلتر قیمت
 products = products.filter(price__gte=min_price)
+
 products = products.filter(price__lte=max_price)
 ```
 
@@ -55,17 +58,24 @@ products = products.filter(price__lte=max_price)
 
 ```python
 import django_filters
+
 from .models import Product
 
 
 class ProductFilter(django_filters.FilterSet):
+
     q = django_filters.CharFilter(field_name='name', lookup_expr='icontains')
+
     min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
+
     max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
+
     category = django_filters.CharFilter(field_name='category__slug')
-    
+
     class Meta:
+
         model = Product
+
         fields = ['q', 'min_price', 'max_price', 'category']
 ```
 
@@ -79,16 +89,23 @@ class ProductFilter(django_filters.FilterSet):
 
 ```python
 def __iter__(self):
+
     product_ids = self.cart.keys()
+
     products = Product.objects.filter(id__in=product_ids, is_active=True)
+
     cart = self.cart.copy()
-    
+
     for product in products:
+
         cart[str(product.id)]['product'] = product
-    
+
     for item in cart.values():
+
         item['price'] = Decimal(item['price'])
+
         item['total_price'] = item['price'] * item['quantity']
+
         yield item
 ```
 
@@ -124,9 +141,13 @@ Paginator یعنی صفحه‌بندی (Pagination). وقتی تعداد داد�
 
 ```text
 Post 1
+
 Post 2
+
 Post 3
+
 ...
+
 Post 1000
 ```
 
@@ -134,9 +155,13 @@ Post 1000
 
 ```text
 صفحه 1 → Post 1 تا 10
+
 صفحه 2 → Post 11 تا 20
+
 صفحه 3 → Post 21 تا 30
+
 ...
+
 صفحه 100 → Post 991 تا 1000
 ```
 
@@ -157,16 +182,21 @@ Post 1000
 from django.core.paginator import Paginator
 
 # گرفتن همه محصولات
+
 products = Product.objects.filter(is_active=True)
 
 # ساخت Paginator با 9 محصول در هر صفحه
+
 paginator = Paginator(products, 9)
 
 # گرفتن شماره صفحه از URL
+
 page_number = request.GET.get('page')
+
 page_obj = paginator.get_page(page_number)
 
 # پاس دادن به template
+
 context = {'products': page_obj, 'page_obj': page_obj}
 ```
 
@@ -174,19 +204,27 @@ context = {'products': page_obj, 'page_obj': page_obj}
 
 ```html
 {% for product in products %}
+
     {{ product.name }}
+
 {% endfor %}
 
 {% if is_paginated %}
+
     {% if page_obj.has_previous %}
+
         <a href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+
     {% endif %}
-    
+
     صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}
-    
+
     {% if page_obj.has_next %}
+
         <a href="?page={{ page_obj.next_page_number }}">بعدی</a>
+
     {% endif %}
+
 {% endif %}
 ```
 
@@ -254,6 +292,7 @@ cp .env.example .env
 
 ```bash
 python manage.py makemigrations
+
 python manage.py migrate
 ```
 
@@ -483,7 +522,13 @@ cart = {
 
 ## مجوز
 
-این پروژه تحت مجوز Apache License 2.0 منتشر شده است. برای اطلاعات بیشتر به فایل [LICENSE](LICENSE) مراجعه کنید.
+این پروژه تحت مجوز **All Rights Reserved** منتشر شده است.
+
+تمام حقوق این پروژه متعلق به **امیرعلی پوربابایی** است.
+
+هرگونه استفاده، کپی، تغییر، توزیع، انتشار، فروش یا استفاده تجاری بدون اجازه کتبی مالک ممنوع است.
+
+برای اطلاعات بیشتر به فایل [LICENSE](LICENSE) مراجعه کنید.
 
 ---
 

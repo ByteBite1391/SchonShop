@@ -1,109 +1,98 @@
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, DetailView
-from django.db.models import Count, Q
 from .models import Category, Product
-
-class HomeView(ListView):
-    model = Product
-    template_name = 'shop/home.html'
-    context_object_name = 'products'
-    
-    def get_queryset(self):
-        return Product.objects.filter(is_active=True).select_related('category')
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        context['featured_products'] = Product.objects.filter(
-            is_active=True,
-            stock__gt=0
-        ).select_related('category').order_by('-created')[:4]
-        
-        context['best_sellers'] = Product.objects.filter(
-            is_active=True,
-            stock__gt=0
-        ).select_related('category').annotate(
-            order_count=Count('order_items')
-        ).order_by('-order_count', '-created')[:8]
-        
-        if not context['best_sellers']:
-            context['best_sellers'] = Product.objects.filter(
-                is_active=True,
-                stock__gt=0
-            ).select_related('category').order_by('-created')[:8]
-        
-        return context
+from .filters import ProductFilter
 
 
-class ProductListView(ListView):
-    model = Product
-    template_name = 'shop/product_list.html'
-    context_object_name = 'products'
-    paginate_by = 9
+# صفحه اصلی سایت
+def home(request):
+    # ۴ محصول آخر که موجودی دارن
+    featured_products = Product.objects.filter(
+        is_active=True,
+        stock__gt=0
+    ).order_by('-created')[:4]
     
-    def get_queryset(self):
-        queryset = Product.objects.filter(is_active=True)
-        
-        query = self.request.GET.get('q')
-        if query:
-            queryset = queryset.filter(
-                Q(name__icontains=query) | 
-                Q(description__icontains=query) |
-                Q(category__name__icontains=query)
-            )
-        
-        category_slug = self.request.GET.get('category') or self.kwargs.get('category_slug')
-        if category_slug:
-            queryset = queryset.filter(category__slug=category_slug)
-        
-        min_price = self.request.GET.get('min_price')
-        max_price = self.request.GET.get('max_price')
-        if min_price:
-            queryset = queryset.filter(price__gte=min_price)
-        if max_price:
-            queryset = queryset.filter(price__lte=max_price)
-        
-        sort = self.request.GET.get('sort')
-        if sort == 'price_asc':
-            queryset = queryset.order_by('price')
-        elif sort == 'price_desc':
-            queryset = queryset.order_by('-price')
-        elif sort == 'newest':
-            queryset = queryset.order_by('-created')
-        elif sort == 'name':
-            queryset = queryset.order_by('name')
-        else:
-            queryset = queryset.order_by('-created')
-        
-        return queryset.select_related('category')
+    categories = Category.objects.all()
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['current_category'] = self.request.GET.get('category', '')
-        context['query'] = self.request.GET.get('q', '')
-        context['min_price'] = self.request.GET.get('min_price', '')
-        context['max_price'] = self.request.GET.get('max_price', '')
-        context['sort'] = self.request.GET.get('sort', '')
-        return context
+    context = {
+        'featured_products': featured_products,
+        'categories': categories,
+    }
+    return render(request, 'shop/home.html', context)
 
 
-class ProductDetailView(DetailView):
-    model = Product
-    template_name = 'shop/product_detail.html'
-    context_object_name = 'product'
+# لیست محصولات + جستجو + فیلتر
+def product_list(request, category_slug=None):
+    # همه محصولات فعال
+    products = Product.objects.filter(is_active=True)
     
-    def get_queryset(self):
-        return Product.objects.filter(is_active=True).select_related('category').prefetch_related('images')
+    # دسته بندی در آدرس (url)
+    if category_slug:
+        category = get_object_or_404(Category, slug=category_slug)
+        products = products.filter(category=category)
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        product = self.get_object()
+    # انجام فیلتر ها با django-filter
+    product_filter = ProductFilter(request.GET, queryset=products)
+    products = product_filter.qs
+    
+    # مرتب سازی
+    sort = request.GET.get('sort')
+    if sort == 'price_asc': # گرفتن محصولات از کم به زیاد
+        products = products.order_by('price')
+    elif sort == 'price_desc': # گرفتن محصولات از زیاد به کم
+        products = products.order_by('-price')
+    else: # گرفتن محصولات بر اساس زمان ایجاد (زودتر)
+        products = products.order_by('-created')
+    
+    # شماره صفحه رو از URL می‌گیریم
+    page_number = request.GET.get('page', 1)
+    try:
+        page_number = int(page_number)
+    except ValueError:
+        page_number = 1
         
-        context['related_products'] = Product.objects.filter(
-            category=product.category,
-            is_active=True
-        ).exclude(id=product.id).select_related('category')[:4]
-        
-        context['is_available'] = product.stock > 0
-        
-        return context
+    # ادامه با ai نوشته شده است
+    
+    # محاسبه شروع و پایان برای slicing
+    per_page = 9
+    total = products.count()
+    start = (page_number - 1) * per_page
+    end = start + per_page
+    products_page = products[start:end]
+    
+    # تعداد کل صفحات با فرمول سقف
+    total_pages = (total + per_page - 1) // per_page
+    has_previous = page_number > 1
+    has_next = page_number < total_pages
+    
+    context = {
+        'products': products_page,
+        'filter': product_filter,
+        'categories': Category.objects.all(),
+        'current_category': category_slug,
+        'sort': sort or '',
+        'page_number': page_number,
+        'total_pages': total_pages,
+        'has_previous': has_previous,
+        'has_next': has_next,
+        'previous_page': page_number - 1,
+        'next_page': page_number + 1,
+    }
+    return render(request, 'shop/product_list.html', context)
+
+
+# صفحه جزئیات محصول
+def product_detail(request, slug):
+    # فقط محصول فعال رو نشون بده
+    product = get_object_or_404(Product, slug=slug, is_active=True)
+    
+    # محصولات همون دسته، بدون خودش
+    related_products = Product.objects.filter(
+        category=product.category,
+        is_active=True
+    ).exclude(id=product.id)[:4]
+    
+    context = {
+        'product': product,
+        'related_products': related_products,
+    }
+    return render(request, 'shop/product_detail.html', context)

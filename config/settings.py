@@ -1,6 +1,8 @@
 # config/settings.py
 import os
 from pathlib import Path
+
+from django.conf.global_settings import MEDIA_ROOT
 from django.contrib.messages import constants as messages
 from dotenv import load_dotenv
 
@@ -30,7 +32,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    
+    'django_filters',
     'storages',
     
     # Local apps
@@ -218,44 +220,49 @@ JAZZMIN_UI_TWEAKS = {
     },
 }
 
-# ========== ArvanCloud Object Storage ==========
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL', 'https://s3.ir-tbz-sh1.arvanstorage.ir')
-AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'ir-tbz-sh1')
+if os.environ.get('MEDIA_MODULE') == 'arvancloud':
+    # ========== ArvanCloud Object Storage ==========
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL', 'https://s3.ir-tbz-sh1.arvanstorage.ir')
+    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'ir-tbz-sh1')
 
-# تنظیمات اضافی S3
-AWS_DEFAULT_ACL = 'public-read'
-AWS_S3_FILE_OVERWRITE = False
-AWS_QUERYSTRING_AUTH = False
-AWS_S3_OBJECT_PARAMETERS = {
-    'CacheControl': 'max-age=86400',
-}
+    # تنظیمات اضافی S3
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
 
-# Custom domain برای دسترسی مستقیم به فایل‌ها
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.arvanstorage.ir'
+    # Custom domain برای دسترسی مستقیم به فایل‌ها
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.arvanstorage.ir'
 
-# استفاده از Object Storage برای media
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        "OPTIONS": {
-            "access_key": AWS_ACCESS_KEY_ID,
-            "secret_key": AWS_SECRET_ACCESS_KEY,
-            "bucket_name": AWS_STORAGE_BUCKET_NAME,
-            "endpoint_url": AWS_S3_ENDPOINT_URL,
-            "region_name": AWS_S3_REGION_NAME,
-            "default_acl": AWS_DEFAULT_ACL,
-            "file_overwrite": AWS_S3_FILE_OVERWRITE,
-            "querystring_auth": AWS_QUERYSTRING_AUTH,
-            "location": "media",
-            "custom_domain": AWS_S3_CUSTOM_DOMAIN,
+    # استفاده از Object Storage برای media
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "access_key": AWS_ACCESS_KEY_ID,
+                "secret_key": AWS_SECRET_ACCESS_KEY,
+                "bucket_name": AWS_STORAGE_BUCKET_NAME,
+                "endpoint_url": AWS_S3_ENDPOINT_URL,
+                "region_name": AWS_S3_REGION_NAME,
+                "default_acl": AWS_DEFAULT_ACL,
+                "file_overwrite": AWS_S3_FILE_OVERWRITE,
+                "querystring_auth": AWS_QUERYSTRING_AUTH,
+                "location": "media",
+                "custom_domain": AWS_S3_CUSTOM_DOMAIN,
+            },
         },
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+    
+elif os.environ.get('MEDIA_MODULE') == 'local':
+    MEDIA_ROOT = os.environ.get('MEDIA_ROOT')
+    MEDIA_URL = '/media/'
